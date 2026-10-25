@@ -1,2 +1,2 @@
 # remedy
-remedy calculator
+Remedy calculator, created by Jacob Richardson
