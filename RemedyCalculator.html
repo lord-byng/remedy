@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher Remedy Calculator</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+        margin: 0;
+        background: #f4f6f8;
+        color: #333;
+    }
+
+    header {
+        background: #1f4e79;
+        color: white;
+        padding: 20px;
+    }
+
+    header h1 {
+        margin: 0;
+    }
+
+    .container {
+        display: flex;
+        gap: 20px;
+        padding: 20px;
+        align-items: flex-start;
+    }
+
+    .main {
+        flex: 3;
+    }
+
+    .sidebar {
+        flex: 1;
+        min-width: 300px;
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 20px;
+    }
+
+    .class-card {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        border-left: 8px solid #4CAF50;
+    }
+
+    .class-card.has-remedy {
+        border-left-color: #ffb300;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+        gap: 12px;
+    }
+
+    label {
+        display: block;
+        font-weight: bold;
+        font-size: 0.9rem;
+        margin-bottom: 4px;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 8px;
+    }
+
+    .checkbox-row {
+        display: flex;
+        align-items: center;
+    }
+
+    .checkbox-row input {
+        width: auto;
+    }
+
+    .results {
+        margin-top: 15px;
+        padding: 12px;
+        background: #eef5ff;
+        border-radius: 8px;
+    }
+
+    .button-row {
+        margin-top: 15px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    button {
+        cursor: pointer;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 6px;
+        font-weight: bold;
+    }
+
+    .primary {
+        background: #1f4e79;
+        color: white;
+    }
+
+    .duplicate {
+        background: #4caf50;
+        color: white;
+    }
+
+    .delete {
+        background: #c62828;
+        color: white;
+    }
+
+    .summary {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        border-bottom: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background: #f2f2f2;
+    }
+
+    h2 {
+        margin-top: 0;
+    }
+
+    .total-box {
+        margin-top: 15px;
+        background: #eef5ff;
+        padding: 15px;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
+
+    ul, ol {
+        padding-left: 20px;
+    }
+
+    .tooltip {
+        position: relative;
+        display: inline-block;
+        color: #1f4e79;
+        cursor: help;
+        margin-left: 4px;
+    }
+
+    .tooltiptext {
+        visibility: hidden;
+        width: 280px;
+        background-color: #333;
+        color: white;
+        text-align: left;
+        padding: 8px;
+        border-radius: 6px;
+
+        position: absolute;
+        z-index: 1000;
+
+        top: 125%;
+        left: 50%;
+        margin-left: -140px;
+
+        opacity: 0;
+        transition: opacity 0.2s;
+
+        font-weight: normal;
+        font-size: 0.85rem;
+    }
+
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    pre {
+        white-space: pre-wrap;
+    }
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>Teacher Remedy Calculator</h1>
+</header>
+
+<div class="container">
+
+    <div class="main">
+
+        <button class="primary" onclick="addClass()">+ Add Class</button>
+
+        <div id="classes"></div>
+
+        <div class="summary">
+            <h2>Summary</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Class</th>
+                        <th>Remedy Minutes</th>
+                    </tr>
+                </thead>
+                <tbody id="summaryBody"></tbody>
+            </table>
+
+            <div class="total-box" id="totals">
+                Total Monthly Remedy: 0.0 minutes (0.00 hours)
+            </div>
+        </div>
+
+    </div>
+
+    <div class="sidebar">
+
+        <h2>Finding Designations in MyEd</h2>
+
+        <ol>
+            <li>Open Gradebook.</li>
+            <li>Click <strong>Reports</strong>.</li>
+            <li>Hover over <strong>BC Class Lists</strong>.</li>
+            <li>Select <strong>BC Class List w. Desig</strong>.</li>
+            <li>Click <strong>Run</strong>.</li>
+            <li>Count students with designations:
+                <ul>
+                    <li>A</li>
+                    <li>C</li>
+                    <li>G</li>
+                    <li>H</li>
+                </ul>
+            </li>
+        </ol>
+
+        <hr>
+
+        <h2>Class Size Caps</h2>
+
+        <ul>
+            <li>Regular: 30</li>
+            <li>English: 28</li>
+            <li>ADST: 24</li>
+            <li>Drafting: 30</li>
+            <li>ELL: 20</li>
+        </ul>
+
+        <h2>Multi-Grade Rule</h2>
+
+        <p>
+            If students are being taught and assessed differently,
+            reduce the applicable class cap by <strong>2</strong>.
+            Different course codes alone do not trigger this adjustment.
+        </p>
+
+        <h2>Composition Rule</h2>
+
+        <p>
+            Maximum of <strong>2</strong> students with severe designations.
+        </p>
+
+        <p>
+            Severe designations:
+            <strong>A, C, G, H</strong>
+        </p>
+
+        <h2>Formula</h2>
+
+<pre>
+Total Excess =
+Students Over Cap
++
+Designations Above 2
+
+Base Minutes =
+Total Excess × 180
+
+Linear:
+× 0.143
+
+Semester:
+× 0.286
+</pre>
+
+    </div>
+
+</div>
+
+<script>
+let classCounter = 1;
+
+function getCap(type) {
+    switch(type) {
+        case 'english':
+            return 28;
+        case 'adst':
+            return 24;
+        case 'drafting':
+            return 30;
+        case 'ell':
+            return 20;
+        default:
+            return 30;
+    }
+}
+
+function addClass(data = null) {
+
+    const container = document.getElementById("classes");
+
+    const card = document.createElement("div");
+    card.className = "class-card";
+
+    const defaultName = "Class " + classCounter++;
+
+    card.innerHTML = `
+        <div class="grid">
+
+            <div>
+                <label>Class Name</label>
+                <input class="class-name" value="${data?.name || defaultName}">
+            </div>
+
+            <div>
+                <label>Course Type</label>
+                <select class="course-type">
+                    <option value="regular">Regular</option>
+                    <option value="english">English</option>
+                    <option value="adst">ADST</option>
+                    <option value="drafting">Drafting</option>
+                    <option value="ell">ELL</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Schedule Type</label>
+                <select class="schedule-type">
+                    <option value="linear">Linear</option>
+                    <option value="semester">Semester</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Enrolment</label>
+                <input type="number" min="0" class="enrolment" value="${data?.enrolment || 0}">
+            </div>
+
+            <div>
+                <label>Severe Designations (A, C, G, H)</label>
+                <input type="number" min="0" class="severe" value="${data?.severe || 0}">
+            </div>
+
+            <div>
+                <label>
+                    Multiple Grades?
+                    <span class="tooltip">
+                        ⓘ
+                        <span class="tooltiptext">
+                            Only check this if students are being taught and assessed differently, not just because they have different course codes.
+                        </span>
+                    </span>
+                </label>
+
+                <div class="checkbox-row">
+                    <input type="checkbox" class="multigrade">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="results"></div>
+
+        <div class="button-row">
+            <button class="duplicate">Duplicate Class</button>
+            <button class="delete">Delete Class</button>
+        </div>
+    `;
+
+    container.appendChild(card);
+
+    if (data) {
+        card.querySelector(".course-type").value = data.courseType;
+        card.querySelector(".schedule-type").value = data.scheduleType;
+        card.querySelector(".multigrade").checked = data.multiGrade;
+    }
+
+    card.querySelectorAll("input, select").forEach(el => {
+        el.addEventListener("input", updateAll);
+        el.addEventListener("change", updateAll);
+    });
+
+    card.querySelector(".delete").onclick = () => {
+        card.remove();
+        updateAll();
+    };
+
+    card.querySelector(".duplicate").onclick = () => {
+        addClass(extractData(card));
+        updateAll();
+    };
+
+    updateAll();
+}
+
+function extractData(card) {
+    return {
+        name: card.querySelector(".class-name").value,
+        courseType: card.querySelector(".course-type").value,
+        scheduleType: card.querySelector(".schedule-type").value,
+        enrolment: card.querySelector(".enrolment").value,
+        severe: card.querySelector(".severe").value,
+        multiGrade: card.querySelector(".multigrade").checked
+    };
+}
+
+function updateAll() {
+
+    const cards = document.querySelectorAll(".class-card");
+    const summaryBody = document.getElementById("summaryBody");
+
+    summaryBody.innerHTML = "";
+
+    let totalMinutes = 0;
+
+    cards.forEach(card => {
+
+        const name =
+            card.querySelector(".class-name").value || "Unnamed Class";
+
+        const courseType =
+            card.querySelector(".course-type").value;
+
+        const scheduleType =
+            card.querySelector(".schedule-type").value;
+
+        const enrolment =
+            Number(card.querySelector(".enrolment").value);
+
+        const severe =
+            Number(card.querySelector(".severe").value);
+
+        const multiGrade =
+            card.querySelector(".multigrade").checked;
+
+        let cap = getCap(courseType);
+
+        if (multiGrade) {
+            cap -= 2;
+        }
+
+        const overCap =
+            Math.max(0, enrolment - cap);
+
+        const compositionExcess =
+            Math.max(0, severe - 2);
+
+        const totalExcess =
+            overCap + compositionExcess;
+
+        const baseMinutes =
+            totalExcess * 180;
+
+        const multiplier =
+            scheduleType === "linear"
+                ? 0.143
+                : 0.286;
+
+        const remedyMinutes =
+            baseMinutes * multiplier;
+
+        totalMinutes += remedyMinutes;
+
+        card.classList.toggle(
+            "has-remedy",
+            remedyMinutes > 0
+        );
+
+        card.querySelector(".results").innerHTML = `
+            <strong>Effective Cap:</strong> ${cap}<br>
+            <strong>Students Over Cap:</strong> ${overCap}<br>
+            <strong>Composition Excess:</strong> ${compositionExcess}<br>
+            <strong>Total Excess:</strong> ${totalExcess}<br>
+            <strong>Monthly Remedy:</strong> ${remedyMinutes.toFixed(1)} minutes
+        `;
+
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${name}</td>
+            <td>${remedyMinutes.toFixed(1)}</td>
+        `;
+
+        summaryBody.appendChild(row);
+
+    });
+
+    const totalHours = totalMinutes / 60;
+
+    document.getElementById("totals").innerHTML =
+        `Total Monthly Remedy: ${totalMinutes.toFixed(1)} minutes (${totalHours.toFixed(2)} hours)`;
+}
+
+addClass();
+</script>
+
+</body>
+</html>
