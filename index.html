@@ -264,14 +264,15 @@
         <hr>
 
         <h2>Class Size Caps</h2>
-
-        <ul>
-            <li>Regular: 30</li>
-            <li>English: 28</li>
-            <li>ADST: 24</li>
-            <li>Drafting: 30</li>
-            <li>ELL: 20</li>
-        </ul>
+	<ul>
+    <li>Standard: 30</li>
+    <li>Drafting: 30</li>
+    <li>English Language Arts: 28</li>
+    <li>Foods: 28</li>
+    <li>Textiles: 28</li>
+    <li>Tech Studies: 24</li>
+    <li>ELL: 20</li>
+	</ul>
 
         <h2>Multi-Grade Rule</h2>
 
@@ -321,7 +322,11 @@ function getCap(type) {
     switch(type) {
         case 'english':
             return 28;
-        case 'adst':
+        case 'foods':
+            return 28;
+        case 'textiles':
+            return 28;
+        case 'techStudies':
             return 24;
         case 'drafting':
             return 30;
@@ -352,12 +357,14 @@ function addClass(data = null) {
             <div>
                 <label>Course Type</label>
                 <select class="course-type">
-                    <option value="regular">Regular</option>
-                    <option value="english">English</option>
-                    <option value="adst">ADST</option>
-                    <option value="drafting">Drafting</option>
-                    <option value="ell">ELL</option>
-                </select>
+    <option value="regular">Standard (Cap 30)</option>
+    <option value="english">English Language Arts (Cap 28)</option>
+    <option value="drafting">Drafting (Cap 30)</option>
+    <option value="foods">Foods (Cap 28)</option>
+    <option value="textiles">Textiles (Cap 28)</option>
+    <option value="techStudies">Tech Studies (Cap 24)</option>
+    <option value="ell">ELL (Cap 20)</option>
+</select>
             </div>
 
             <div>
